@@ -6,23 +6,45 @@ import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 
 import stringStyles from "./string.module.css";
+// import circleStyles from "../../components/ui/circle/circle.module.css"
+
+enum EColors {
+  Default = "",
+  Changing = "changing",
+  Modified = "modified",
+}
+
+type TVizualization = {
+  value: string;
+  color: EColors;
+};
 
 export const StringComponent: React.FC = () => {
   const [isLoader, setLoader] = React.useState(false);
   const [text, setText] = React.useState("");
-  const [vizualization, setVizualization] = React.useState<string[]>([]);
+  const [vizualization, setVizualization] = React.useState<TVizualization[]>(
+    []
+  );
 
   async function onClickHandler(): Promise<void> {
     setLoader(true);
-    const array = text.split('')
-    setVizualization(array)
-    for (let i = 0; i < (array.length / 2); i++) {
-      console.log(array)
-      let tmp = array[i]
-      array[i] = array[array.length - i - 1]
-      array[array.length - i - 1] = tmp
-      await wait(1000)
-      setVizualization(array)
+    const array: TVizualization[] = text.split("").map((letter) => ({
+      value: letter,
+      color: EColors.Default,
+    }));
+
+    for (let i = 0; i < array.length / 2; i++) {
+      array[i].color = EColors.Changing;
+      array[array.length - i - 1].color = EColors.Changing;
+
+      setVizualization([...array]);
+      let tmp = array[i];
+      array[i] = array[array.length - i - 1];
+      array[array.length - i - 1] = tmp;
+      await wait(1000);
+
+      array[i].color = EColors.Modified;
+      array[array.length - i - 1].color = EColors.Modified;
     }
     setLoader(false);
   }
@@ -48,9 +70,13 @@ export const StringComponent: React.FC = () => {
         <p className={stringStyles.subtitle}>Максимум — 11 символов</p>
       </div>
       <div className={stringStyles.vizualization}>
-        {vizualization.map((letter) => {
-          return <Circle key={letter} letter={letter}></Circle>;
-        })}
+        {vizualization.map(({ value, color }) => (
+          <Circle
+            extraClass={stringStyles[color]}
+            key={value}
+            letter={value}
+          ></Circle>
+        ))}
       </div>
     </SolutionLayout>
   );

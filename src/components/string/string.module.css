@@ -25,3 +25,11 @@
   margin: 120px 0 0 0;
   justify-content: center;
 }
+
+.changing > :nth-child(2) {
+  border-color: #d252e1;
+}
+
+.modified > :nth-child(2) {
+  border-color: #7fe051;
+}
