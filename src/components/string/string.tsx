@@ -6,7 +6,6 @@ import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 
 import stringStyles from "./string.module.css";
-// import circleStyles from "../../components/ui/circle/circle.module.css"
 
 enum EColors {
   Default = "",
@@ -75,7 +74,7 @@ export const StringComponent: React.FC = () => {
             extraClass={stringStyles[color]}
             key={value}
             letter={value}
-          ></Circle>
+          ></Circle>  
         ))}
       </div>
     </SolutionLayout>

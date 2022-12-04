@@ -5,6 +5,7 @@
 
 .input {
   display: flex;
+  grid-gap: 12px;
   gap: 12px;
 }
 
@@ -21,15 +22,9 @@
   display: flex;
   grid-gap: 16px;
   gap: 16px;
-  margin: 120px 0 0 0;
-  justify-content: center;
+  grid-row-gap: 78px;
+  margin: 48px auto 0;
+  width: 100%;
+  max-width: 944px;
   flex-wrap: wrap;
-}
-
-.changing > :nth-child(2) {
-  border-color: #d252e1;
-}
-
-.modified > :nth-child(2) {
-  border-color: #7fe051;
 }
