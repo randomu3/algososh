@@ -71,9 +71,11 @@ export const SortingPage: React.FC = () => {
       ]);
     });
   }
+
   function onClickSelectSortHandler(): void {
     selectSort(array, direction);
   }
+
   async function selectSort(array: number[], flag: TDirection): Promise<void> {
     setLoader({
       increasing: flag === "decreasing",
@@ -84,23 +86,39 @@ export const SortingPage: React.FC = () => {
       decreasing: flag === "decreasing",
       submit: true,
     });
-    await wait(2000);
+
     for (let j = 0; j < array.length - 1; j++) {
       let max = flag === "increasing" ? -Infinity : Infinity;
       let index = 0;
-      // изменять цвета color
+
+      setVizualization((vizualization) => {
+        vizualization[j].color = ElementStates.Changing;
+        return vizualization;
+      });
+      setVizualization([...vizualization]);
+
+      await wait(500);
+
       for (let i = 0; i < array.length - j; i++) {
+        setVizualization((vizualization) => {
+          vizualization[i].color = ElementStates.Changing;
+          return vizualization;
+        });
+        setVizualization([...vizualization]);
+
         if (flag === "increasing" ? array[i] > max : array[i] < max) {
           max = array[i];
           index = i;
         }
+        await wait(500);
       }
-
       let tmp = array[array.length - 1 - j];
       array[array.length - 1 - j] = max;
       array[index] = tmp;
     }
+    
     console.log(array);
+
     setDisabled({
       increasing: false,
       decreasing: false,
