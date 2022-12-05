@@ -69,10 +69,10 @@ export const StringComponent: React.FC = () => {
         <p className={stringStyles.subtitle}>Максимум — 11 символов</p>
       </div>
       <div className={stringStyles.vizualization}>
-        {vizualization.map(({ value, color }) => (
+        {vizualization.map(({ value, color }, index) => (
           <Circle
             extraClass={stringStyles[color]}
-            key={value}
+            key={index}
             letter={value}
           ></Circle>  
         ))}
