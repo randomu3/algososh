@@ -15,6 +15,7 @@ type TVizualization = {
   number: number;
 };
 type TSorting = "bubble" | "choice";
+type TDirection = "decreasing" | "increasing" | "";
 
 type TInitialStateDisabled = {
   decreasing: boolean;
@@ -50,7 +51,6 @@ export const SortingPage: React.FC = () => {
   );
   const [array, setArray] = React.useState<number[]>([]);
   const [sorting, setSorting] = React.useState<TSorting>("choice");
-  const [direction, setDirection] = React.useState<string>("");
 
   function onClickArrayHandler(): void {
     setVizualization([]);
@@ -71,18 +71,14 @@ export const SortingPage: React.FC = () => {
     });
   }
 
-  function onClickSelectSortHandler(): void {
-    selectSort(array, direction);
-  }
-
-  async function selectSort(array: number[], flag: string): Promise<void> {
+  async function selectSort(array: number[], flag: TDirection): Promise<void> {
     setLoader({
-      increasing: flag === "increasing", // возрастание
-      decreasing: flag === "decreasing", // убывание
+      increasing: flag === "decreasing",
+      decreasing: flag === "increasing",
     });
     setDisabled({
-      increasing: flag === "decreasing", // возрастание
-      decreasing: flag === "increasing", // убывание
+      increasing: flag === "increasing",
+      decreasing: flag === "decreasing",
       submit: true,
     });
     for (let j = 0; j < array.length - 1; j++) {
@@ -93,13 +89,13 @@ export const SortingPage: React.FC = () => {
         if (vizualization[j].color === ElementStates.Modified) {
           return vizualization;
         }
-        vizualization[j].color = ElementStates.Changing;
+        vizualization[vizualization.length - 1 - j].color = ElementStates.Changing;
         return vizualization;
       });
       setVizualization([...vizualization]);
 
       await wait(100);
-
+      
       for (let i = 0; i < array.length - j; i++) {
         setVizualization((vizualization) => {
           vizualization[i].color = ElementStates.Changing;
@@ -152,7 +148,7 @@ export const SortingPage: React.FC = () => {
 
   async function bubbleSort(
     array: number[],
-    flag: string
+    flag: TDirection
   ): Promise<number[]> {
     for (let i = 0; i < array.length; i++) {
       for (let j = 0; j < array.length; j++) {
@@ -194,8 +190,7 @@ export const SortingPage: React.FC = () => {
           <Button
             disabled={disabled.increasing}
             onClick={() => {
-              setDirection("increasing");
-              onClickSelectSortHandler();
+              selectSort(array, "decreasing"); // swap
             }}
             text="По возрастанию"
             sorting={Direction.Ascending}
@@ -204,8 +199,7 @@ export const SortingPage: React.FC = () => {
           <Button
             disabled={disabled.decreasing}
             onClick={() => {
-              setDirection("decreasing");
-              onClickSelectSortHandler();
+              selectSort(array, "increasing"); // swap
             }}
             text="По убыванию"
             sorting={Direction.Descending}
