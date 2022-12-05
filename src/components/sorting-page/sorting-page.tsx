@@ -15,7 +15,6 @@ type TVizualization = {
   number: number;
 };
 type TSorting = "bubble" | "choice";
-type TDirection = "decreasing" | "increasing";
 
 type TInitialStateDisabled = {
   decreasing: boolean;
@@ -50,8 +49,8 @@ export const SortingPage: React.FC = () => {
     []
   );
   const [array, setArray] = React.useState<number[]>([]);
-  const [sorting, setSorting] = React.useState<TSorting>("bubble");
-  const [direction, setDirection] = React.useState<TDirection>("decreasing");
+  const [sorting, setSorting] = React.useState<TSorting>("choice");
+  const [direction, setDirection] = React.useState<string>("");
 
   function onClickArrayHandler(): void {
     setVizualization([]);
@@ -76,28 +75,30 @@ export const SortingPage: React.FC = () => {
     selectSort(array, direction);
   }
 
-  async function selectSort(array: number[], flag: TDirection): Promise<void> {
+  async function selectSort(array: number[], flag: string): Promise<void> {
     setLoader({
-      increasing: flag === "decreasing",
-      decreasing: flag === "increasing",
+      increasing: flag === "increasing", // возрастание
+      decreasing: flag === "decreasing", // убывание
     });
     setDisabled({
-      increasing: flag === "increasing",
-      decreasing: flag === "decreasing",
+      increasing: flag === "decreasing", // возрастание
+      decreasing: flag === "increasing", // убывание
       submit: true,
     });
-
     for (let j = 0; j < array.length - 1; j++) {
-      let max = flag === "increasing" ? -Infinity : Infinity;
+      let max = flag === "decreasing" ? -Infinity : Infinity;
       let index = 0;
 
       setVizualization((vizualization) => {
+        if (vizualization[j].color === ElementStates.Modified) {
+          return vizualization;
+        }
         vizualization[j].color = ElementStates.Changing;
         return vizualization;
       });
       setVizualization([...vizualization]);
 
-      await wait(500);
+      await wait(100);
 
       for (let i = 0; i < array.length - j; i++) {
         setVizualization((vizualization) => {
@@ -106,18 +107,37 @@ export const SortingPage: React.FC = () => {
         });
         setVizualization([...vizualization]);
 
-        if (flag === "increasing" ? array[i] > max : array[i] < max) {
+        if (flag === "decreasing" ? array[i] > max : array[i] < max) {
           max = array[i];
           index = i;
         }
-        await wait(500);
+
+        await wait(100);
+        if (i !== j) {
+          setVizualization((vizualization) => {
+            vizualization[i].color = ElementStates.Default;
+            return vizualization;
+          });
+          setVizualization([...vizualization]);
+        }
       }
       let tmp = array[array.length - 1 - j];
       array[array.length - 1 - j] = max;
       array[index] = tmp;
+      setVizualization((vizualization) => {
+        vizualization[vizualization.length - 1 - j].number = max;
+        vizualization[vizualization.length - 1 - j].color =
+          ElementStates.Modified;
+        vizualization[index].number = tmp;
+        return vizualization;
+      });
     }
-    
-    console.log(array);
+
+    setVizualization((vizualization) => {
+      vizualization[0].color = ElementStates.Modified;
+      return vizualization;
+    });
+    setVizualization([...vizualization]);
 
     setDisabled({
       increasing: false,
@@ -129,9 +149,10 @@ export const SortingPage: React.FC = () => {
       decreasing: false,
     });
   }
+
   async function bubbleSort(
     array: number[],
-    flag: TDirection
+    flag: string
   ): Promise<number[]> {
     for (let i = 0; i < array.length; i++) {
       for (let j = 0; j < array.length; j++) {
