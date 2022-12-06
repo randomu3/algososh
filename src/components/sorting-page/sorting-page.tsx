@@ -9,7 +9,6 @@ import { Direction } from "../../types/direction";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { Column } from "../ui/column/column";
 import { wait } from "../../utilities/utilities";
-import { debug } from "console";
 
 type TVizualization = {
   color: ElementStates;
@@ -246,11 +245,13 @@ export const SortingPage: React.FC = () => {
       <div className={sortinPageStyles.container}>
         <div className={sortinPageStyles.radioContainer}>
           <RadioInput
+            disabled={disabled.choice}
             checked={sorting === "choice"}
             onChange={() => setSorting("choice")}
             label="Выбор"
           ></RadioInput>
           <RadioInput
+            disabled={disabled.bubble}
             checked={sorting === "bubble"}
             onChange={() => setSorting("bubble")}
             label="Пузырёк"

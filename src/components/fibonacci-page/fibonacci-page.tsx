@@ -52,7 +52,7 @@ export const FibonacciPage: React.FC = () => {
       </div>
       <div className={fibonacciStyles.vizualization}>
         {vizualization.map((number, index) => (
-          <Circle index={index} key={number} letter={number.toString()}></Circle>
+          <Circle key={index} index={index} letter={number.toString()}></Circle>
         ))}
       </div>
     </SolutionLayout>
