@@ -9,15 +9,19 @@ import { Direction } from "../../types/direction";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { Column } from "../ui/column/column";
 import { wait } from "../../utilities/utilities";
+import { debug } from "console";
 
 type TVizualization = {
   color: ElementStates;
   number: number;
 };
+
 type TSorting = "bubble" | "choice";
 type TDirection = "decreasing" | "increasing" | "";
 
 type TInitialStateDisabled = {
+  bubble: boolean;
+  choice: boolean;
   decreasing: boolean;
   increasing: boolean;
   submit: boolean;
@@ -29,6 +33,8 @@ type TInitialStateLoader = {
 };
 
 const initialStateDisabled = {
+  bubble: true,
+  choice: true,
   decreasing: true,
   increasing: true,
   submit: false,
@@ -50,11 +56,13 @@ export const SortingPage: React.FC = () => {
     []
   );
   const [array, setArray] = React.useState<number[]>([]);
-  const [sorting, setSorting] = React.useState<TSorting>("choice");
+  const [sorting, setSorting] = React.useState<TSorting>("bubble");
 
   function onClickArrayHandler(): void {
     setVizualization([]);
     setDisabled({
+      bubble: false,
+      choice: false,
       decreasing: false,
       increasing: false,
       submit: false,
@@ -71,71 +79,91 @@ export const SortingPage: React.FC = () => {
     });
   }
 
-  async function selectSort(array: number[], flag: TDirection): Promise<void> {
-    setLoader({
-      increasing: flag === "decreasing",
-      decreasing: flag === "increasing",
-    });
-    setDisabled({
-      increasing: flag === "increasing",
-      decreasing: flag === "decreasing",
-      submit: true,
-    });
-    for (let j = 0; j < array.length - 1; j++) {
-      let max = flag === "decreasing" ? -Infinity : Infinity;
-      let index = 0;
-
-      setVizualization((vizualization) => {
-        if (vizualization[j].color === ElementStates.Modified) {
-          return vizualization;
-        }
-        vizualization[vizualization.length - 1 - j].color = ElementStates.Changing;
-        return vizualization;
-      });
-      setVizualization([...vizualization]);
-
-      await wait(100);
-      
-      for (let i = 0; i < array.length - j; i++) {
-        setVizualization((vizualization) => {
-          vizualization[i].color = ElementStates.Changing;
-          return vizualization;
-        });
-        setVizualization([...vizualization]);
-
-        if (flag === "decreasing" ? array[i] > max : array[i] < max) {
-          max = array[i];
-          index = i;
-        }
-
-        await wait(100);
-        if (i !== j) {
-          setVizualization((vizualization) => {
-            vizualization[i].color = ElementStates.Default;
-            return vizualization;
-          });
-          setVizualization([...vizualization]);
-        }
-      }
-      let tmp = array[array.length - 1 - j];
-      array[array.length - 1 - j] = max;
-      array[index] = tmp;
-      setVizualization((vizualization) => {
-        vizualization[vizualization.length - 1 - j].number = max;
-        vizualization[vizualization.length - 1 - j].color =
-          ElementStates.Modified;
-        vizualization[index].number = tmp;
-        return vizualization;
-      });
-    }
-
+  function modifiedColorColumn(
+    index: number,
+    ElementStates: ElementStates,
+    number: number
+  ): void {
     setVizualization((vizualization) => {
-      vizualization[0].color = ElementStates.Modified;
+      [...vizualization, (vizualization[index].color = ElementStates)];
+      [...vizualization, (vizualization[index].number = number)];
       return vizualization;
     });
     setVizualization([...vizualization]);
+  }
+
+  function defaultColorColumn(
+    index: number,
+    ElementStates: ElementStates
+  ): void {
+    setVizualization((vizualization) => {
+      [...vizualization, (vizualization[index].color = ElementStates)];
+      return vizualization;
+    });
+    setVizualization([...vizualization]);
+  }
+
+  function changingColorColumn(
+    index: number,
+    ElementStates: ElementStates
+  ): void {
+    setVizualization((vizualization) => {
+      [...vizualization, (vizualization[index].color = ElementStates)];
+      return vizualization;
+    });
+    setVizualization([...vizualization]);
+  }
+
+  async function selectSort(array: number[], flag: TDirection): Promise<void> {
+    setLoader({
+      increasing: flag === "increasing",
+      decreasing: flag === "decreasing",
+    });
+    setDisabled({
+      bubble: true,
+      choice: true,
+      increasing: true,
+      decreasing: true,
+      submit: true,
+    });
+
+    let min = 0;
+    let buff = 0;
+
+    for (let j = 0; j < array.length - 1; j++) {
+      min = flag === "increasing" ? Infinity : -Infinity;
+      let index = 0;
+      changingColorColumn(j, ElementStates.Changing);
+
+      for (let i = j; i < array.length; i++) {
+        changingColorColumn(i, ElementStates.Changing);
+
+        await wait(1000);
+        if (flag === "increasing" ? array[i] < min : array[i] > min) {
+          min = array[i];
+          index = i;
+        }
+
+        if (i !== j) defaultColorColumn(i, ElementStates.Default);
+      }
+      defaultColorColumn(j, ElementStates.Default);
+
+      buff = array[j];
+      array[j] = min;
+      array[index] = buff;
+
+      modifiedColorColumn(j, ElementStates.Modified, min);
+    }
+
+    modifiedColorColumn(
+      array.length - 1,
+      ElementStates.Modified,
+      array[array.length - 1]
+    );
 
     setDisabled({
+      bubble: false,
+      choice: false,
       increasing: false,
       decreasing: false,
       submit: false,
@@ -146,25 +174,67 @@ export const SortingPage: React.FC = () => {
     });
   }
 
-  async function bubbleSort(
-    array: number[],
-    flag: TDirection
-  ): Promise<number[]> {
-    for (let i = 0; i < array.length; i++) {
-      for (let j = 0; j < array.length; j++) {
-        if (flag === "increasing" ? array[i] < array[j] : array[i] > array[j]) {
-          let tmp = array[i];
-          array[i] = array[j];
-          array[j] = tmp;
+  async function bubbleSort(array: number[], flag: TDirection): Promise<void> {
+    setLoader({
+      increasing: flag === "increasing",
+      decreasing: flag === "decreasing",
+    });
+    setDisabled({
+      bubble: true,
+      choice: true,
+      increasing: true,
+      decreasing: true,
+      submit: true,
+    });
+
+    let tmp = 0;
+    for (let j = 0; j < array.length - 1; j++) {
+      for (let i = 0; i < array.length - 1 - j; i++) {
+        changingColorColumn(i, ElementStates.Changing);
+        changingColorColumn(i + 1, ElementStates.Changing);
+        await wait(1000);
+
+        if (
+          flag === "increasing"
+            ? array[i] > array[i + 1]
+            : array[i] < array[i + 1]
+        ) {
+          tmp = array[i + 1];
+          array[i + 1] = array[i];
+          array[i] = tmp;
+        }
+
+        defaultColorColumn(i, ElementStates.Default);
+        if (i + 1 === array.length - 1 - j)
+          modifiedColorColumn(
+            array.length - 1 - j,
+            ElementStates.Modified,
+            array[array.length - 1 - j]
+          );
+
+        if (j === array.length - 2 && i === array.length - 2 - j) {
+          modifiedColorColumn(0, ElementStates.Modified, array[i]);
         }
       }
     }
-    return array;
+
+    setDisabled({
+      bubble: false,
+      choice: false,
+      increasing: false,
+      decreasing: false,
+      submit: false,
+    });
+    setLoader({
+      increasing: false,
+      decreasing: false,
+    });
   }
-  function getRandomArbitrary(min: number, max: number) {
+
+  function getRandomArbitrary(min: number, max: number): number {
     return Math.random() * (max - min) + min;
   }
-  function randomArr(min: number, max: number, length: number) {
+  function randomArr(min: number, max: number, length: number): number[] {
     const numbers = [...Array(length)];
     for (let i = 0; i < numbers.length; i += 1) {
       numbers[i] = Math.floor(getRandomArbitrary(min, max));
@@ -190,7 +260,8 @@ export const SortingPage: React.FC = () => {
           <Button
             disabled={disabled.increasing}
             onClick={() => {
-              selectSort(array, "decreasing"); // swap
+              if (sorting === "bubble") bubbleSort(array, "increasing");
+              if (sorting === "choice") selectSort(array, "increasing");
             }}
             text="По возрастанию"
             sorting={Direction.Ascending}
@@ -199,7 +270,8 @@ export const SortingPage: React.FC = () => {
           <Button
             disabled={disabled.decreasing}
             onClick={() => {
-              selectSort(array, "increasing"); // swap
+              if (sorting === "bubble") bubbleSort(array, "decreasing");
+              if (sorting === "choice") selectSort(array, "decreasing");
             }}
             text="По убыванию"
             sorting={Direction.Descending}
