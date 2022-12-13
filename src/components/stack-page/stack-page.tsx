@@ -9,173 +9,91 @@ import { ElementStates } from "../../types/element-states";
 import stackStyles from "./stackPage.module.css";
 import { wait } from "../../utilities/utilities";
 
-type TVizualization = {
-  value?: string;
-  color: ElementStates;
-  top?: string;
+interface IStack<T> {
+  push: (letter: T) => void;
+  pop: () => void;
+  peak: () => void;
+  clear: () => void;
+  getStack: () => T[];
+  getLength: () => number;
+}
+
+type TStack = {
+  letter: string;
+  state: ElementStates;
 };
 
-type TInitialStateDisabled = {
-  add: boolean;
-  del: boolean;
-  clear: boolean;
+type TLoader = {
+  push: boolean;
+  pop: boolean;
 };
 
-type TIinitalStateLoader = {
-  add: boolean;
-  del: boolean;
-  clear: boolean;
-};
+class Stack<T> implements IStack<T> {
+  private container: T[] = [];
 
-const initialStateDisabled: TInitialStateDisabled = {
-  add: false,
-  del: true,
-  clear: true,
-};
+  push = (letter: T) => {
+    this.container.push(letter);
+  };
+  pop = () => {
+    this.container.pop();
+  };
+  peak = () => {
+    return this.container[this.getLength() - 1];
+  };
+  clear = () => {
+    this.container = [];
+  };
+  getStack = () => {
+    return this.container;
+  };
+  getLength = () => this.container.length;
+}
 
-const initialStateLoader: TIinitalStateLoader = {
-  add: false,
-  del: false,
-  clear: false,
+const initialStateStack = new Stack<TStack>();
+const InitialStateLoader: TLoader = {
+  push: false,
+  pop: false,
 };
 
 export const StackPage: React.FC = () => {
-  const [disabled, setDisabled] = React.useState<TInitialStateDisabled>(
-    initialStateDisabled
-  );
-  const [text, setText] = React.useState("");
-  const [isLoader, setLoader] = React.useState<TIinitalStateLoader>(
-    initialStateLoader
-  );
-  const [vizualization, setVizualization] = React.useState<TVizualization[]>(
-    []
-  );
+  const [stack, setStack] = React.useState<Stack<TStack>>(initialStateStack);
+  const [text, setText] = React.useState<string>("");
+  const [vizualization, setVizualization] = React.useState<TStack[]>([]);
+  const [isLoader, setLoader] = React.useState<TLoader>(InitialStateLoader);
 
-  function onChangeHandler(e: React.FormEvent<HTMLInputElement>) {
-    const value = e.currentTarget.value;
-    if (value.length <= 4) {
-      setText(value);
-    }
+  function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
+    setText(e.currentTarget.value);
   }
 
-  function clearVizualizationTop(array: TVizualization[], flag?: "del"): void {
-    if (!flag) {
-      for (let i = 0; i < array.length; i++) {
-        setVizualization((vizualization) => {
-          [...vizualization, (vizualization[i].top = "")];
-          return vizualization;
-        });
-      }
-    }
-
-    if (flag === "del") {
-      setVizualization((vizualization) => {
-        debugger;
-        if (vizualization.length) {
-          [
-            ...vizualization,
-            (vizualization[
-              array.length > 1 ? array.length - 2 : array.length - 1
-            ].top = "top"),
-          ];
-        }
-        return vizualization;
-      });
-    }
+  async function loader(stack: Stack<TStack>) {
+    setStack(stack);
+    setVizualization([...stack.getStack()]);
+    await wait(500);
   }
 
-  async function onClickAddHandler(): Promise<void> {
-    if (!text.length) return;
+  async function push() {
+    setLoader({ ...isLoader, push: true });
+    stack.push({ letter: text, state: ElementStates.Changing });
     setText("");
-
-    if (vizualization.length)
-      setDisabled({ ...disabled, del: false, clear: false });
-    if (vizualization.length > 2) setDisabled({ ...disabled, add: true });
-
-    setDisabled({
-      add: true,
-      del: true,
-      clear: true,
-    });
-    setLoader({
-      add: true,
-      del: false,
-      clear: false,
-    });
-
-    setVizualization([
-      ...vizualization,
-      { value: text, color: ElementStates.Changing, top: "top" },
-    ]);
-
-    clearVizualizationTop(vizualization);
-
-    await wait(500);
-
-    setVizualization([
-      ...vizualization,
-      { value: text, color: ElementStates.Default, top: "top" },
-    ]);
-
-    setLoader({
-      add: false,
-      del: false,
-      clear: false,
-    });
-    setDisabled({
-      add: !(vizualization.length < 3),
-      del: false,
-      clear: false,
-    });
+    await loader(stack);
+    stack.peak().state = ElementStates.Default;
+    await loader(stack);
+    setLoader({ ...isLoader, push: false });
   }
 
-  async function onClickDelHandler(): Promise<void> {
-    setLoader({
-      add: false,
-      del: true,
-      clear: false,
-    });
-    setDisabled({
-      add: true,
-      del: true,
-      clear: true,
-    });
-
-    setVizualization((vizualization) => {
-      [
-        ...vizualization,
-        (vizualization[vizualization.length - 1].color =
-          ElementStates.Changing),
-      ];
-      return vizualization;
-    });
-    setVizualization([...vizualization]);
-
-    await wait(500);
-
-    setVizualization([...vizualization].slice(0, -1));
-    clearVizualizationTop(vizualization, "del");
-
-    if (disabled.add === true) setDisabled({ ...disabled, add: false });
-    if (vizualization.length === 1) setDisabled({ ...disabled, del: false });
-
-    setLoader({
-      add: false,
-      del: false,
-      clear: false,
-    });
-    setDisabled({
-      add: false,
-      del: false,
-      clear: false,
-    });
-    if (vizualization.length === 1)
-      setDisabled({ add: false, del: true, clear: true });
+  async function pop() {
+    setLoader({ ...isLoader, pop: true });
+    stack.peak().state = ElementStates.Changing;
+    await loader(stack);
+    stack.pop();
+    await loader(stack);
+    setLoader({ ...isLoader, pop: false });
   }
 
-  function onClickClearHandler() {
+  function clear() {
+    stack.clear();
+    setStack(stack);
     setVizualization([]);
-    setDisabled({ ...disabled, add: false, del: true, clear: true });
   }
 
   return (
@@ -186,42 +104,42 @@ export const StackPage: React.FC = () => {
             <Input
               extraClass={stackStyles.input}
               value={text}
+              maxLength={4}
               onChange={onChangeHandler}
             ></Input>
             <Button
-              disabled={disabled.add}
+              disabled={!text}
               extraClass={stackStyles.button}
-              isLoader={isLoader.add}
-              onClick={onClickAddHandler}
+              isLoader={isLoader.push}
+              onClick={push}
               text="Добавить"
             ></Button>
             <Button
-              disabled={disabled.del}
+              disabled={!stack.getLength()}
               extraClass={stackStyles.button}
-              isLoader={isLoader.del}
-              onClick={onClickDelHandler}
+              isLoader={isLoader.pop}
+              onClick={pop}
               text="Удалить"
             ></Button>
           </div>
           <Button
-            disabled={disabled.clear}
-            isLoader={isLoader.clear}
+            disabled={!stack.getLength}
             extraClass={stackStyles.button}
-            onClick={onClickClearHandler}
+            onClick={clear}
             text="Очистить"
           ></Button>
         </div>
         <p className={stackStyles.subtitle}>Максимум — 4 символа</p>
       </div>
       <div className={stackStyles.circles}>
-        {vizualization.map(({ color, top, value }, index) => {
+        {vizualization.map((letter, index) => {
           return (
             <Circle
               key={index}
-              state={color}
-              head={top}
+              state={letter.state}
               index={index}
-              letter={value}
+              head={index === stack.getLength() - 1 ? "top" : ""}
+              letter={letter.letter}
             ></Circle>
           );
         })}
