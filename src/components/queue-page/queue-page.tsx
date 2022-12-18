@@ -8,241 +8,157 @@ import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 
 import queueStyles from "./queuePage.module.css";
 
-type TVizualization = {
-  value?: string;
-  color?: ElementStates;
-  head?: string;
-  tail?: string;
-  use: boolean;
+interface IQueue<T> {
+  enqueue: (item: T) => void;
+  dequeue: () => void;
+
+  getHead: () => T | null;
+  getHeadIndex: () => number;
+  getTail: () => T | null;
+  getTailIndex: () => number;
+  getQueue: () => (T | null)[];
+
+  isEmpty: () => boolean;
+  isFull: () => boolean;
+}
+
+class Queue<T> implements IQueue<T> {
+  // array
+  private container: (T | null)[] = [];
+  // size n length
+  private readonly size: number = 0;
+  private length: number = 0;
+
+  private head = 0;
+  private tail = 0;
+
+  constructor(size: number) {
+    this.size = size;
+    this.container = Array(size);
+  }
+
+  isEmpty = () => this.length === 0;
+  isFull = () => this.length >= this.size;
+
+  enqueue = (item: T) => {
+    if (this.length >= this.size) {
+      throw new Error("Maximum length exceeded");
+    }
+    if (!this.isEmpty()) {
+      this.tail = (this.tail + 1) % this.size;
+    }
+    this.container[this.tail % this.size] = item;
+    this.length++;
+  };
+  dequeue = () => {
+    if (this.isEmpty()) {
+      throw new Error("No elements in the queue");
+    }
+
+    this.container[this.head % this.size] = null;
+    this.head = (this.head + 1) % this.size;
+    this.length--;
+  };
+
+  getHead = () => {
+    if (this.isEmpty()) {
+      throw new Error("No elements in the queue");
+    }
+    return this.container[this.head];
+  };
+  getHeadIndex = () => {
+    return this.head;
+  };
+
+  getTail = () => {
+    if (this.isEmpty()) {
+      throw new Error("No elements in the queue");
+    }
+    return this.container[this.tail];
+  };
+  getTailIndex = () => {
+    return this.tail;
+  };
+
+  getQueue = () => {
+    return this.container;
+  };
+}
+
+type TQueue = {
+  letter: string;
+  state: ElementStates;
 };
 
-type TInitialStateDisabled = {
+type TLoader = {
   add: boolean;
   del: boolean;
-  clear: boolean;
 };
 
-type TIinitalStateLoader = {
-  add: boolean;
-  del: boolean;
-  clear: boolean;
-};
+const initialStateQueue: TQueue[] = [...Array(7)].map((e) => ({
+    letter: "",
+    state: ElementStates.Default,
+}))
 
-const initialStateDisabled: TInitialStateDisabled = {
-  add: false,
-  del: true,
-  clear: true,
-};
-
-const initialStateLoader: TIinitalStateLoader = {
+const initialStateLoader: TLoader = {
   add: false,
   del: false,
-  clear: false,
 };
 
-const initialStateVizualization: TVizualization[] = new Array(7)
-  .fill(null)
-  .map(() => {
-    return { color: ElementStates.Default, use: false };
-  });
-
 export const QueuePage: React.FC = () => {
-  const [disabled, setDisabled] = React.useState<TInitialStateDisabled>(
-    initialStateDisabled
+  const [text, setText] = React.useState<string>("");
+  const [isLoader, setLoader] = React.useState<TLoader>(initialStateLoader);
+  const [queue, setQueue] = React.useState<IQueue<TQueue>>(
+    new Queue<TQueue>(7)
   );
-  const [text, setText] = React.useState("");
-  const [isLoader, setLoader] = React.useState<TIinitalStateLoader>(
-    initialStateLoader
-  );
-  const [vizualization, setVizualization] = React.useState<TVizualization[]>(
-    initialStateVizualization
+  const [vizualization, setVizualization] = React.useState<(TQueue | null)[]>(
+    []
   );
 
-  function onChangeHandler(e: React.FormEvent<HTMLInputElement>) {
-    const value = e.currentTarget.value;
-    if (value.length <= 4) {
-      setText(value);
-    }
-  } // validation
+  function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
+    setText(e.currentTarget.value);
+  }
 
-  async function onClickAddHandler(): Promise<void> {
-    for (let i = 0; i < vizualization.length - 1; i++) {
-      setVizualization((vizualization) => {
-        [...vizualization, (vizualization[i].tail = "")];
-        return [...vizualization];
-      });
-      if (
-        vizualization[i].head === "head" &&
-        vizualization[i].tail === "tail" &&
-        !vizualization[i].value
-      ) {
-        setLoader({ ...isLoader, add: true });
-        setVizualization((vizualization) => {
-          [...vizualization, (vizualization[i].color = ElementStates.Changing)];
-          return [...vizualization];
-        });
-        await wait(500);
-        setVizualization((vizualization) => {
-          [
-            ...vizualization,
-            (vizualization[i].tail = "tail"),
-            (vizualization[i].value = text),
-            (vizualization[i].color = ElementStates.Default),
-            (vizualization[i].use = true),
-          ];
-          return [...vizualization];
-        });
-        setLoader({ ...isLoader, add: false });
-        break;
-      }
-      if (
-        vizualization[i].value &&
-        i < vizualization.length - 1 &&
-        !vizualization[i + 1].value &&
-        vizualization[i + 1].use === false
-      ) {
-        setLoader({ ...isLoader, add: true });
-        setVizualization((vizualization) => {
-          [
-            ...vizualization,
-            (vizualization[i + 1].color = ElementStates.Changing),
-          ];
-          return [...vizualization];
-        });
-        await wait(500);
-        setVizualization((vizualization) => {
-          [
-            ...vizualization,
-            ((vizualization[i + 1].value = text),
-            (vizualization[i + 1].tail = "tail"),
-            (vizualization[i + 1].use = true),
-            (vizualization[i + 1].color = ElementStates.Default)),
-          ];
-          return [...vizualization];
-        });
-        setLoader({ ...isLoader, add: false });
-        break;
-      }
-    }
-    if (!vizualization[0].value && !vizualization[0].use) {
-      setLoader({ ...isLoader, add: true });
-      setVizualization((vizualization) => {
-        [...vizualization, (vizualization[0].color = ElementStates.Changing)];
-        return [...vizualization];
-      });
-      await wait(500);
-      setVizualization((vizualization) => {
-        [
-          ...vizualization,
-          ((vizualization[0].value = text),
-          (vizualization[0].tail = "tail"),
-          (vizualization[0].use = true),
-          (vizualization[0].color = ElementStates.Default)),
-        ];
-        return [...vizualization];
-      });
-      setLoader({ ...isLoader, add: false });
-    }
+  async function loader(queue: IQueue<TQueue>) {
+    setQueue(queue);
+    setVizualization([...queue.getQueue()]);
+    await wait(500);
+  }
 
-    if (vizualization[vizualization.length - 1].use) {
-      setDisabled({
-        add: true,
-        del: false,
-        clear: false,
-      });
+  function clear(): void {
+    setQueue(new Queue<TQueue>(7));
+    setVizualization(initialStateQueue);
+  }
+
+  async function enqueue(): Promise<void> {
+    setLoader({ ...isLoader, add: true });
+    queue.enqueue({ letter: text, state: ElementStates.Changing });
+    const newTail = queue.getTail();
+    setText("");
+    await loader(queue);
+    if (newTail) newTail.state = ElementStates.Default;
+    loader(queue);
+    setLoader({ ...isLoader, add: false });
+  }
+
+  async function dequeue(): Promise<void> {
+    setLoader({ ...isLoader, del: true });
+    const head = queue.getHead();
+    if (head) {
+      head.state = ElementStates.Changing;
     }
+    await loader(queue);
+    queue.dequeue();
+    loader(queue);
+    if (queue.isEmpty()) {
+      clear();
+    }
+    setLoader({ ...isLoader, del: false });
   }
 
   React.useEffect(() => {
-    let value = 0;
-    vizualization.forEach((e) => {
-      if (e.use) {
-        if (e.value) {
-          value++;
-        }
-        return setDisabled({ ...disabled, del: false, clear: false });
-      }
-    });
-    for (let i = 0; i < vizualization.length; i++) {
-      if (
-        vizualization[i].tail &&
-        vizualization[i].use &&
-        !vizualization[i].value
-      ) {
-        vizualization[i].head = "head";
-      }
-      if (vizualization[i].value && i !== vizualization.length) {
-        vizualization[i].head = "head";
-        break;
-      }
-    }
-    if (value === 0) {
-      return setDisabled({...disabled, del: true})
-    }
-    return () => {
-      [...vizualization];
-    };
-  }, [vizualization]);
-
-  React.useEffect(() => {
-    text.length
-      ? setDisabled({ ...disabled, add: false })
-      : setDisabled({ ...disabled, add: true });
-    return () => {
-      setDisabled({ ...disabled });
-    };
-  }, [text]);
-
-  async function onClickDelHandler(): Promise<void> {
-    for (let i = 0; i < vizualization.length; i++) {
-      if (vizualization[i].value) {
-        setLoader({ ...isLoader, del: true });
-        setVizualization((vizualization) => {
-          [...vizualization, (vizualization[i].color = ElementStates.Changing)];
-          return [...vizualization];
-        });
-        await wait(500);
-        setVizualization((vizualization) => {
-          [
-            ...vizualization,
-            delete vizualization[i].value,
-            delete vizualization[i].head,
-            (vizualization[i].color = ElementStates.Default),
-          ];
-          return [...vizualization];
-        });
-
-        if (i === vizualization.length - 1) {
-          setVizualization((vizualization) => {
-            [
-              ...vizualization,
-              (vizualization[vizualization.length - 1].head = "head"),
-              (vizualization[vizualization.length - 1].tail = ""),
-            ];
-            return [...vizualization];
-          });
-        }
-        setLoader({ ...isLoader, del: false });
-        break;
-      }
-    }
-  }
-
-  async function onClickClearHandler() {
-    vizualization.forEach((e, index) => {
-      setVizualization((vizualization) => {
-        [
-          ...vizualization,
-          delete vizualization[index].value,
-          (vizualization[index].use = false),
-          (vizualization[index].head = ""),
-          (vizualization[index].tail = ""),
-        ];
-        return [...vizualization];
-      });
-    });
-    setDisabled({ add: false, del: true, clear: true });
-  }
+    setVizualization(initialStateQueue);
+  }, []);
 
   return (
     <SolutionLayout title="Очередь">
@@ -251,45 +167,49 @@ export const QueuePage: React.FC = () => {
           <div className={queueStyles.subForm}>
             <Input
               extraClass={queueStyles.input}
+              maxLength={4}
               value={text}
-              onChange={onChangeHandler}
+              onChange={(e) => onChangeHandler(e)}
             ></Input>
             <Button
-              disabled={disabled.add}
+              disabled={!text || queue.isFull()}
               extraClass={queueStyles.button}
               isLoader={isLoader.add}
-              onClick={onClickAddHandler}
+              onClick={() => enqueue()}
               text="Добавить"
             ></Button>
             <Button
-              disabled={disabled.del}
+              disabled={queue.isEmpty()}
               extraClass={queueStyles.button}
               isLoader={isLoader.del}
-              onClick={onClickDelHandler}
+              onClick={() => dequeue()}
               text="Удалить"
             ></Button>
           </div>
           <Button
-            disabled={disabled.clear}
-            isLoader={isLoader.clear}
+            disabled={queue.isEmpty()}
             extraClass={queueStyles.button}
-            onClick={onClickClearHandler}
+            onClick={() => clear()}
             text="Очистить"
           ></Button>
         </div>
         <p className={queueStyles.subtitle}>Максимум — 4 символа</p>
       </div>
       <div className={queueStyles.circles}>
-        {vizualization.map(({ color, head, value, tail }, index) => {
+        {vizualization.map((item, index) => {
           return (
             <Circle
-              tail={tail}
-              key={index}
-              state={color}
-              head={head}
+              letter={item ? item.letter : ""}
+              state={item ? item.state : ElementStates.Default}
               index={index}
-              letter={value}
-            ></Circle>
+              key={index}
+              head={
+                index === queue.getHeadIndex() && !queue.isEmpty() ? "head" : ""
+              }
+              tail={
+                index === queue.getTailIndex() && !queue.isEmpty() ? "tail" : ""
+              }
+            />
           );
         })}
       </div>

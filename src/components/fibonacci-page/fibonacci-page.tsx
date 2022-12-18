@@ -18,12 +18,14 @@ export const FibonacciPage: React.FC = () => {
       f2 = 1,
       cf = 0;
     for (let i = 1; i <= Number(text); i++) {
+      // eslint-disable-next-line
       setVizualization((vizualization) => [...vizualization, f2]);
       cf = f1 + f2;
       f1 = f2;
       f2 = cf;
       await wait(500);
       if (i === Number(text)) {
+        // eslint-disable-next-line
         setVizualization((vizualization) => [...vizualization, f2]);
       }
     }

@@ -1,5 +1,4 @@
-import React, { useCallback } from "react";
-import { consumers } from "stream";
+import React from "react";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
@@ -56,22 +55,28 @@ const InitialStateLoader: TLoader = {
 };
 
 export const StackPage: React.FC = () => {
-  const [stack, setStack] = React.useState<Stack<TStack>>(initialStateStack);
   const [text, setText] = React.useState<string>("");
-  const [vizualization, setVizualization] = React.useState<TStack[]>([]);
   const [isLoader, setLoader] = React.useState<TLoader>(InitialStateLoader);
+  const [stack, setStack] = React.useState<Stack<TStack>>(initialStateStack);
+  const [vizualization, setVizualization] = React.useState<TStack[]>([]);
 
   function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
     setText(e.currentTarget.value);
   }
 
-  async function loader(stack: Stack<TStack>) {
+  async function loader(stack: Stack<TStack>): Promise<void> {
     setStack(stack);
     setVizualization([...stack.getStack()]);
     await wait(500);
   }
 
-  async function push() {
+  function clear(): void {
+    stack.clear();
+    setStack(stack);
+    setVizualization([]);
+  }
+
+  async function push(): Promise<void> {
     setLoader({ ...isLoader, push: true });
     stack.push({ letter: text, state: ElementStates.Changing });
     setText("");
@@ -81,19 +86,13 @@ export const StackPage: React.FC = () => {
     setLoader({ ...isLoader, push: false });
   }
 
-  async function pop() {
+  async function pop(): Promise<void> {
     setLoader({ ...isLoader, pop: true });
     stack.peak().state = ElementStates.Changing;
     await loader(stack);
     stack.pop();
     await loader(stack);
     setLoader({ ...isLoader, pop: false });
-  }
-
-  function clear() {
-    stack.clear();
-    setStack(stack);
-    setVizualization([]);
   }
 
   return (
@@ -105,27 +104,27 @@ export const StackPage: React.FC = () => {
               extraClass={stackStyles.input}
               value={text}
               maxLength={4}
-              onChange={onChangeHandler}
+              onChange={(e) => onChangeHandler(e)}
             ></Input>
             <Button
               disabled={!text}
               extraClass={stackStyles.button}
               isLoader={isLoader.push}
-              onClick={push}
+              onClick={() => push()}
               text="Добавить"
             ></Button>
             <Button
               disabled={!stack.getLength()}
               extraClass={stackStyles.button}
               isLoader={isLoader.pop}
-              onClick={pop}
+              onClick={() => pop()}
               text="Удалить"
             ></Button>
           </div>
           <Button
             disabled={!stack.getLength}
             extraClass={stackStyles.button}
-            onClick={clear}
+            onClick={() => clear()}
             text="Очистить"
           ></Button>
         </div>

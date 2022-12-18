@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin: 0 auto;
+    max-width: 952px;
+}
+
+.container:first-of-type {
+    padding-bottom: 12px;
+}
+
+.inputLetter {
+    max-width: 204px;
+}
+
+.buttonLetter {
+    flex-grow: 1;
+}
+
+.listContainerLetter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 90px;
+    gap: 16px;
+}
+
+.listLetter {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.addLetter {
+    position: absolute;
+    top: -65px;
+    left: 13px;
+}
+
+.removeLetter {
+    position: absolute;
+    bottom: -90px;
+    left: 10px;
+}

@@ -45,12 +45,10 @@ const initialStateLoader = {
 };
 
 export const SortingPage: React.FC = () => {
-  const [disabled, setDisabled] = React.useState<TInitialStateDisabled>(
-    initialStateDisabled
-  );
-  const [isLoader, setLoader] = React.useState<TInitialStateLoader>(
-    initialStateLoader
-  );
+  const [disabled, setDisabled] =
+    React.useState<TInitialStateDisabled>(initialStateDisabled);
+  const [isLoader, setLoader] =
+    React.useState<TInitialStateLoader>(initialStateLoader);
   const [vizualization, setVizualization] = React.useState<TVizualization[]>(
     []
   );
@@ -77,18 +75,17 @@ export const SortingPage: React.FC = () => {
       ]);
     });
   }
-
+  
   function modifiedColorColumn(
     index: number,
     ElementStates: ElementStates,
     number: number
   ): void {
     setVizualization((vizualization) => {
-      [...vizualization, (vizualization[index].color = ElementStates)];
-      [...vizualization, (vizualization[index].number = number)];
-      return vizualization;
+      vizualization[index].color = ElementStates
+      vizualization[index].number = number
+      return [...vizualization]
     });
-    setVizualization([...vizualization]);
   }
 
   function defaultColorColumn(
@@ -96,10 +93,9 @@ export const SortingPage: React.FC = () => {
     ElementStates: ElementStates
   ): void {
     setVizualization((vizualization) => {
-      [...vizualization, (vizualization[index].color = ElementStates)];
-      return vizualization;
+      vizualization[index].color = ElementStates
+      return [...vizualization];
     });
-    setVizualization([...vizualization]);
   }
 
   function changingColorColumn(
@@ -107,10 +103,9 @@ export const SortingPage: React.FC = () => {
     ElementStates: ElementStates
   ): void {
     setVizualization((vizualization) => {
-      [...vizualization, (vizualization[index].color = ElementStates)];
-      return vizualization;
+      vizualization[index].color = ElementStates
+      return [...vizualization];
     });
-    setVizualization([...vizualization]);
   }
 
   async function selectSort(array: number[], flag: TDirection): Promise<void> {
