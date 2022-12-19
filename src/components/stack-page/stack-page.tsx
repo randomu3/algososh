@@ -7,46 +7,7 @@ import { ElementStates } from "../../types/element-states";
 
 import stackStyles from "./stackPage.module.css";
 import { wait } from "../../utilities/utilities";
-
-interface IStack<T> {
-  push: (letter: T) => void;
-  pop: () => void;
-  peak: () => void;
-  clear: () => void;
-  getStack: () => T[];
-  getLength: () => number;
-}
-
-type TStack = {
-  letter: string;
-  state: ElementStates;
-};
-
-type TLoader = {
-  push: boolean;
-  pop: boolean;
-};
-
-class Stack<T> implements IStack<T> {
-  private container: T[] = [];
-
-  push = (letter: T) => {
-    this.container.push(letter);
-  };
-  pop = () => {
-    this.container.pop();
-  };
-  peak = () => {
-    return this.container[this.getLength() - 1];
-  };
-  clear = () => {
-    this.container = [];
-  };
-  getStack = () => {
-    return this.container;
-  };
-  getLength = () => this.container.length;
-}
+import { Stack, TLoader, TStack } from "./utils";
 
 const initialStateStack = new Stack<TStack>();
 const InitialStateLoader: TLoader = {
