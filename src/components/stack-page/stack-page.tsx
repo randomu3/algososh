@@ -8,6 +8,7 @@ import { ElementStates } from "../../types/element-states";
 import stackStyles from "./stackPage.module.css";
 import { wait } from "../../utilities/utilities";
 import { Stack, TLoader, TStack } from "./utils";
+import { useForm } from "../../hooks/useForm";
 
 const initialStateStack = new Stack<TStack>();
 const InitialStateLoader: TLoader = {
@@ -16,14 +17,14 @@ const InitialStateLoader: TLoader = {
 };
 
 export const StackPage: React.FC = () => {
-  const [text, setText] = React.useState<string>("");
+  // const [text, setText] = React.useState<string>("");
+  const { values, handleChange, setValues } = useForm({
+    text: "",
+  });
+
   const [isLoader, setLoader] = React.useState<TLoader>(InitialStateLoader);
   const [stack, setStack] = React.useState<Stack<TStack>>(initialStateStack);
   const [vizualization, setVizualization] = React.useState<TStack[]>([]);
-
-  function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
-    setText(e.currentTarget.value);
-  }
 
   async function loader(stack: Stack<TStack>): Promise<void> {
     setStack(stack);
@@ -39,8 +40,8 @@ export const StackPage: React.FC = () => {
 
   async function push(): Promise<void> {
     setLoader({ ...isLoader, push: true });
-    stack.push({ letter: text, state: ElementStates.Changing });
-    setText("");
+    stack.push({ letter: values.text, state: ElementStates.Changing });
+    setValues({ text: "" });
     await loader(stack);
     stack.peak().state = ElementStates.Default;
     await loader(stack);
@@ -63,12 +64,13 @@ export const StackPage: React.FC = () => {
           <div className={stackStyles.subForm}>
             <Input
               extraClass={stackStyles.input}
-              value={text}
+              value={values.text}
+              name={"text"}
               maxLength={4}
-              onChange={(e) => onChangeHandler(e)}
+              onChange={handleChange}
             ></Input>
             <Button
-              disabled={!text}
+              disabled={!values.text}
               extraClass={stackStyles.button}
               isLoader={isLoader.push}
               onClick={() => push()}

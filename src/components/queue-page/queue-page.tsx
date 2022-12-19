@@ -1,4 +1,5 @@
 import React from "react";
+import { useForm } from "../../hooks/useForm";
 import { ElementStates } from "../../types/element-states";
 import { wait } from "../../utilities/utilities";
 import { Button } from "../ui/button/button";
@@ -10,9 +11,9 @@ import queueStyles from "./queuePage.module.css";
 import { IQueue, Queue, TLoader, TQueue } from "./utils";
 
 const initialStateQueue: TQueue[] = [...Array(7)].map((e) => ({
-    letter: "",
-    state: ElementStates.Default,
-}))
+  letter: "",
+  state: ElementStates.Default,
+}));
 
 const initialStateLoader: TLoader = {
   add: false,
@@ -20,7 +21,10 @@ const initialStateLoader: TLoader = {
 };
 
 export const QueuePage: React.FC = () => {
-  const [text, setText] = React.useState<string>("");
+  const { values, handleChange, setValues } = useForm({
+    text: "",
+  });
+
   const [isLoader, setLoader] = React.useState<TLoader>(initialStateLoader);
   const [queue, setQueue] = React.useState<IQueue<TQueue>>(
     new Queue<TQueue>(7)
@@ -28,10 +32,6 @@ export const QueuePage: React.FC = () => {
   const [vizualization, setVizualization] = React.useState<(TQueue | null)[]>(
     []
   );
-
-  function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
-    setText(e.currentTarget.value);
-  }
 
   async function loader(queue: IQueue<TQueue>) {
     setQueue(queue);
@@ -46,9 +46,9 @@ export const QueuePage: React.FC = () => {
 
   async function enqueue(): Promise<void> {
     setLoader({ ...isLoader, add: true });
-    queue.enqueue({ letter: text, state: ElementStates.Changing });
+    queue.enqueue({ letter: values.text, state: ElementStates.Changing });
     const newTail = queue.getTail();
-    setText("");
+    setValues({ text: "" });
     await loader(queue);
     if (newTail) newTail.state = ElementStates.Default;
     loader(queue);
@@ -82,11 +82,12 @@ export const QueuePage: React.FC = () => {
             <Input
               extraClass={queueStyles.input}
               maxLength={4}
-              value={text}
-              onChange={(e) => onChangeHandler(e)}
+              value={values.text}
+              onChange={handleChange}
+              name={"text"}
             ></Input>
             <Button
-              disabled={!text || queue.isFull()}
+              disabled={!values.text || queue.isFull()}
               extraClass={queueStyles.button}
               isLoader={isLoader.add}
               onClick={() => enqueue()}

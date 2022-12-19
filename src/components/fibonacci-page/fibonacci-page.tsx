@@ -1,4 +1,5 @@
 import React from "react";
+import { useForm } from "../../hooks/useForm";
 import { wait } from "../../utilities/utilities";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -9,22 +10,27 @@ import fibonacciStyles from "./fibonacci-page.module.css";
 
 export const FibonacciPage: React.FC = () => {
   const [isLoader, setLoader] = React.useState(false);
-  const [text, setText] = React.useState("");
+  const { values, handleChange, setValues } = useForm({
+    text: "",
+  });
   const [vizualization, setVizualization] = React.useState<number[]>([]);
 
   async function onClickHandler(): Promise<void> {
     setLoader(true);
+    setValues(() => {
+      return { text: "" };
+    });
     let f1 = 0,
       f2 = 1,
       cf = 0;
-    for (let i = 1; i <= Number(text); i++) {
+    for (let i = 1; i <= Number(values.text); i++) {
       // eslint-disable-next-line
       setVizualization((vizualization) => [...vizualization, f2]);
       cf = f1 + f2;
       f1 = f2;
       f2 = cf;
       await wait(500);
-      if (i === Number(text)) {
+      if (i === Number(values.text)) {
         // eslint-disable-next-line
         setVizualization((vizualization) => [...vizualization, f2]);
       }
@@ -32,10 +38,10 @@ export const FibonacciPage: React.FC = () => {
     setLoader(false);
   }
 
-  function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
+  function onChangeHandler(e: React.ChangeEvent<HTMLInputElement>): void {
     const value = e.currentTarget.value;
     if (Number(value) <= 19) {
-      setText(value);
+      handleChange(e);
     }
   }
 
@@ -43,8 +49,13 @@ export const FibonacciPage: React.FC = () => {
     <SolutionLayout title="Последовательность Фибоначчи">
       <div className={fibonacciStyles.container}>
         <div className={fibonacciStyles.input}>
-          <Input value={text} onChange={onChangeHandler}></Input>
+          <Input
+            name={"text"}
+            value={values.text}
+            onChange={onChangeHandler}
+          ></Input>
           <Button
+            disabled={!values.text}
             isLoader={isLoader}
             onClick={onClickHandler}
             text="Развернуть"

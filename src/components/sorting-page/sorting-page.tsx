@@ -9,27 +9,7 @@ import { Direction } from "../../types/direction";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { Column } from "../ui/column/column";
 import { wait } from "../../utilities/utilities";
-
-type TVizualization = {
-  color: ElementStates;
-  number: number;
-};
-
-type TSorting = "bubble" | "choice";
-type TDirection = "decreasing" | "increasing" | "";
-
-type TInitialStateDisabled = {
-  bubble: boolean;
-  choice: boolean;
-  decreasing: boolean;
-  increasing: boolean;
-  submit: boolean;
-};
-
-type TInitialStateLoader = {
-  decreasing: boolean;
-  increasing: boolean;
-};
+import { TDirection, TInitialStateDisabled, TInitialStateLoader, TSorting, TVizualization } from "./utils";
 
 const initialStateDisabled = {
   bubble: true,

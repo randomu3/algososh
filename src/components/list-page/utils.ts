@@ -1,10 +1,18 @@
 import { ElementStates } from "../../types/element-states";
 
+export type TStateLoader = {
+  append: boolean;
+  prepend: boolean;
+  delHead: boolean;
+  delTail: boolean;
+  addIndex: boolean;
+  delIndex: boolean;
+};
+
 export type TListLetters = {
   letter: string;
   state: ElementStates;
   value?: {
-    // ??
     letter: string;
     state: ElementStates;
     action: "addLetter" | "removeLetter";
