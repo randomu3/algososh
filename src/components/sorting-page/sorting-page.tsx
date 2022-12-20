@@ -9,13 +9,19 @@ import { Direction } from "../../types/direction";
 import { RadioInput } from "../ui/radio-input/radio-input";
 import { Column } from "../ui/column/column";
 import { wait } from "../../utilities/utilities";
-import { TDirection, TInitialStateDisabled, TInitialStateLoader, TSorting, TVizualization } from "./utils";
+import {
+  TDirection,
+  TInitialStateDisabled,
+  TInitialStateLoader,
+  TSorting,
+  TVizualization,
+} from "./utils";
 
 const initialStateDisabled = {
-  bubble: true,
-  choice: true,
-  decreasing: true,
-  increasing: true,
+  bubble: false,
+  choice: false,
+  decreasing: false,
+  increasing: false,
   submit: false,
 };
 
@@ -55,16 +61,16 @@ export const SortingPage: React.FC = () => {
       ]);
     });
   }
-  
+
   function modifiedColorColumn(
     index: number,
     ElementStates: ElementStates,
     number: number
   ): void {
     setVizualization((vizualization) => {
-      vizualization[index].color = ElementStates
-      vizualization[index].number = number
-      return [...vizualization]
+      vizualization[index].color = ElementStates;
+      vizualization[index].number = number;
+      return [...vizualization];
     });
   }
 
@@ -73,7 +79,7 @@ export const SortingPage: React.FC = () => {
     ElementStates: ElementStates
   ): void {
     setVizualization((vizualization) => {
-      vizualization[index].color = ElementStates
+      vizualization[index].color = ElementStates;
       return [...vizualization];
     });
   }
@@ -83,7 +89,7 @@ export const SortingPage: React.FC = () => {
     ElementStates: ElementStates
   ): void {
     setVizualization((vizualization) => {
-      vizualization[index].color = ElementStates
+      vizualization[index].color = ElementStates;
       return [...vizualization];
     });
   }
@@ -215,6 +221,20 @@ export const SortingPage: React.FC = () => {
     }
     return numbers;
   }
+
+  React.useEffect(() => {
+    const minRandom = Math.floor(getRandomArbitrary(3, 17));
+    const maxRandom = Math.floor(getRandomArbitrary(3, 17));
+    const arr = randomArr(minRandom, 100, maxRandom);
+    setArray(arr);
+    arr.forEach((number) => {
+      setVizualization((vizualization) => [
+        ...vizualization,
+        { color: ElementStates.Default, number: Math.floor(number) },
+      ]);
+    });
+  }, []);
+
   return (
     <SolutionLayout title="Сортировка массива">
       <div className={sortinPageStyles.container}>

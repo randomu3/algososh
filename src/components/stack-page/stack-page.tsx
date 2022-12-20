@@ -17,7 +17,6 @@ const InitialStateLoader: TLoader = {
 };
 
 export const StackPage: React.FC = () => {
-  // const [text, setText] = React.useState<string>("");
   const { values, handleChange, setValues } = useForm({
     text: "",
   });
@@ -85,7 +84,7 @@ export const StackPage: React.FC = () => {
             ></Button>
           </div>
           <Button
-            disabled={!stack.getLength}
+            disabled={!stack.getLength()}
             extraClass={stackStyles.button}
             onClick={() => clear()}
             text="Очистить"

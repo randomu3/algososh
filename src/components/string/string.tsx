@@ -1,4 +1,5 @@
 import React from "react";
+import { useForm } from "../../hooks/useForm";
 import { wait } from "../../utilities/utilities";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -20,14 +21,17 @@ type TVizualization = {
 
 export const StringComponent: React.FC = () => {
   const [isLoader, setLoader] = React.useState(false);
-  const [text, setText] = React.useState("");
+  // const [text, setText] = React.useState("");
+  const { values, setValues } = useForm({
+    text: "",
+  });
   const [vizualization, setVizualization] = React.useState<TVizualization[]>(
     []
   );
 
   async function onClickHandler(): Promise<void> {
     setLoader(true);
-    const array: TVizualization[] = text.split("").map((letter) => ({
+    const array: TVizualization[] = values.text.split("").map((letter) => ({
       value: letter,
       color: EColors.Default,
     }));
@@ -51,7 +55,7 @@ export const StringComponent: React.FC = () => {
   function onChangeHandler(e: React.FormEvent<HTMLInputElement>): void {
     const value = e.currentTarget.value;
     if (value.length <= 11) {
-      setText(value);
+      setValues({ text: value });
     }
   }
 
@@ -59,8 +63,13 @@ export const StringComponent: React.FC = () => {
     <SolutionLayout title="Строка">
       <div className={stringStyles.container}>
         <div className={stringStyles.input}>
-          <Input value={text} onChange={onChangeHandler}></Input>
+          <Input
+            name={"text"}
+            value={values.text}
+            onChange={onChangeHandler}
+          ></Input>
           <Button
+            disabled={!values.text}
             isLoader={isLoader}
             onClick={onClickHandler}
             text="Развернуть"
@@ -74,7 +83,7 @@ export const StringComponent: React.FC = () => {
             extraClass={stringStyles[color]}
             key={index}
             letter={value}
-          ></Circle>  
+          ></Circle>
         ))}
       </div>
     </SolutionLayout>

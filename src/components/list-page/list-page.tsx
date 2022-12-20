@@ -273,9 +273,8 @@ export const ListPage: React.FC = () => {
           disabled={
             disabled ||
             !values.index ||
-            !parseInt(values.index) ||
-            LinkedListArray.length >= 10 ||
-            parseInt(values.index) > LinkedListArray.length - 1
+            parseInt(values.index) > LinkedListArray.length - 1 ||
+            parseInt(values.index) < 0
           }
         />
         <Button
