@@ -1,0 +1,30 @@
+.container {
+  width: 522px;
+  margin: 0 auto;
+}
+
+.input {
+  display: flex;
+  grid-gap: 12px;
+  gap: 12px;
+}
+
+.subtitle {
+  font-family: "Segoe UI";
+  font-size: 14px;
+  line-height: 22px;
+  color: #3d3d3d;
+  text-align: left;
+  margin: 4px 0 0 16px;
+}
+
+.vizualization {
+  display: flex;
+  grid-gap: 16px;
+  gap: 16px;
+  grid-row-gap: 78px;
+  margin: 48px auto 0;
+  width: 100%;
+  max-width: 944px;
+  flex-wrap: wrap;
+}

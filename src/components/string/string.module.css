@@ -1,0 +1,35 @@
+.container {
+  width: 522px;
+  margin: 0 auto;
+}
+
+.input {
+  display: flex;
+  gap: 12px;
+}
+
+.subtitle {
+  font-family: "Segoe UI";
+  font-size: 14px;
+  line-height: 22px;
+  color: #3d3d3d;
+  text-align: left;
+  margin: 4px 0 0 16px;
+}
+
+.vizualization {
+  display: flex;
+  grid-gap: 16px;
+  gap: 16px;
+  margin: 120px 0 0 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.changing > :nth-child(2) {
+  border-color: #d252e1;
+}
+
+.modified > :nth-child(2) {
+  border-color: #7fe051;
+}

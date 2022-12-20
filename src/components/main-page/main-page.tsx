@@ -3,10 +3,7 @@ import Marquee from "react-fast-marquee";
 import { Link } from "react-router-dom";
 
 import styles from "./main-page.module.css";
-
-interface MainPageProps {
-  extraClass?: string;
-}
+import { MainPageProps } from "./utils";
 
 export const MainPage: React.FC<MainPageProps> = ({ extraClass = "" }) => {
   return (
