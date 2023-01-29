@@ -21,7 +21,6 @@ type TVizualization = {
 
 export const StringComponent: React.FC = () => {
   const [isLoader, setLoader] = React.useState(false);
-  // const [text, setText] = React.useState("");
   const { values, setValues } = useForm({
     text: "",
   });
@@ -36,7 +35,7 @@ export const StringComponent: React.FC = () => {
       color: EColors.Default,
     }));
 
-    for (let i = 0; i < array.length / 2; i++) {
+    for (let i = 0; i <= array.length / 2; i++) {
       array[i].color = EColors.Changing;
       array[array.length - i - 1].color = EColors.Changing;
 
@@ -49,6 +48,8 @@ export const StringComponent: React.FC = () => {
       array[i].color = EColors.Modified;
       array[array.length - i - 1].color = EColors.Modified;
     }
+
+    setVizualization([...array]);
     setLoader(false);
   }
 
@@ -58,6 +59,7 @@ export const StringComponent: React.FC = () => {
       setValues({ text: value });
     }
   }
+  
 
   return (
     <SolutionLayout title="Строка">
@@ -83,6 +85,7 @@ export const StringComponent: React.FC = () => {
             extraClass={stringStyles[color]}
             key={index}
             letter={value}
+            index={index}
           ></Circle>
         ))}
       </div>

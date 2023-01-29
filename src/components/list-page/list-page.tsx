@@ -291,7 +291,7 @@ export const ListPage: React.FC = () => {
         />
       </div>
 
-      <div className={listStyles.listContainerLetter}>
+      <div data-cy="container" className={listStyles.listContainerLetter}>
         {vizualization?.map((letter, index) => {
           return (
             <li key={index} className={listStyles.listLetter}>
@@ -300,6 +300,7 @@ export const ListPage: React.FC = () => {
                   extraClass={`${listStyles[`${letter.value.action}`]}`}
                   letter={letter.value.letter}
                   state={letter.value.state}
+                  index={index}
                   isSmall
                 />
               )}

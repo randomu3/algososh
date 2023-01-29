@@ -43,7 +43,6 @@ export const StackPage: React.FC = () => {
     setValues({ text: "" });
     await loader(stack);
     stack.peak().state = ElementStates.Default;
-    await loader(stack);
     setLoader({ ...isLoader, push: false });
   }
 

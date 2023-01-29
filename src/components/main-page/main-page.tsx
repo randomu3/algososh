@@ -20,7 +20,7 @@ export const MainPage: React.FC<MainPageProps> = ({ extraClass = "" }) => {
       </div>
       <div className={styles.cards_box}>
         <Link className={styles.link} to="/recursion">
-          <div className={`${styles.card} ${styles.string}`} />
+          <div className={`${styles.card} ${styles.string}`}/>
         </Link>
         <Link className={styles.link} to="/fibonacci">
           <div className={`${styles.card} ${styles.fibonacci}`} />

@@ -20,3 +20,7 @@ export type TInitialStateLoader = {
   decreasing: boolean;
   increasing: boolean;
 };
+
+export type TProps = {
+  inititalArray?: number[]
+}

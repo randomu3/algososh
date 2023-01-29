@@ -13,6 +13,7 @@ import {
   TDirection,
   TInitialStateDisabled,
   TInitialStateLoader,
+  TProps,
   TSorting,
   TVizualization,
 } from "./utils";
@@ -30,7 +31,7 @@ const initialStateLoader = {
   increasing: false,
 };
 
-export const SortingPage: React.FC = () => {
+export const SortingPage: React.FC<TProps> = ({ inititalArray }) => {
   const [disabled, setDisabled] =
     React.useState<TInitialStateDisabled>(initialStateDisabled);
   const [isLoader, setLoader] =
@@ -38,7 +39,14 @@ export const SortingPage: React.FC = () => {
   const [vizualization, setVizualization] = React.useState<TVizualization[]>(
     []
   );
-  const [array, setArray] = React.useState<number[]>([]);
+  const [array, setArray] = React.useState<number[]>(() => {
+    if (inititalArray) {
+      return inititalArray;
+    }
+    const minRandom = Math.floor(getRandomArbitrary(3, 17));
+    const maxRandom = Math.floor(getRandomArbitrary(3, 17));
+    return randomArr(minRandom, 100, maxRandom);
+  });
   const [sorting, setSorting] = React.useState<TSorting>("bubble");
 
   function onClickArrayHandler(): void {
@@ -223,16 +231,13 @@ export const SortingPage: React.FC = () => {
   }
 
   React.useEffect(() => {
-    const minRandom = Math.floor(getRandomArbitrary(3, 17));
-    const maxRandom = Math.floor(getRandomArbitrary(3, 17));
-    const arr = randomArr(minRandom, 100, maxRandom);
-    setArray(arr);
-    arr.forEach((number) => {
+    array.forEach((number) => {
       setVizualization((vizualization) => [
         ...vizualization,
         { color: ElementStates.Default, number: Math.floor(number) },
       ]);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -281,7 +286,7 @@ export const SortingPage: React.FC = () => {
           onClick={onClickArrayHandler}
         ></Button>
       </div>
-      <ul className={sortinPageStyles.columns}>
+      <ul data-testid="list" className={sortinPageStyles.columns}>
         {vizualization.map(({ color, number }, index) => {
           return <Column key={index} state={color} index={number}></Column>;
         })}
