@@ -35,7 +35,7 @@ export const StringComponent: React.FC = () => {
       color: EColors.Default,
     }));
 
-    for (let i = 0; i <= array.length / 2; i++) {
+    for (let i = 0; i < array.length / 2; i++) {
       array[i].color = EColors.Changing;
       array[array.length - i - 1].color = EColors.Changing;
 

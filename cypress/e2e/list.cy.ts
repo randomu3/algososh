@@ -1,14 +1,18 @@
 /// <reference types="cypress" />
-import { SHORT_DELAY_IN_MS, DELAY_IN_MS, LONG_DELAY_IN_MS } from "../../src/constants/delays";
+import {
+  SHORT_DELAY_IN_MS,
+  LONG_DELAY_IN_MS,
+} from "../../src/constants/delays";
 import {
   CHANGING_COLOR,
   DEFAULT_COLOR,
   MODIFIED_COLOR,
 } from "../../src/constants/colors";
+import { getCircle } from "../utils/ultils";
 
 describe("Приложение корректно запускает страницу Связный список:", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/list");
+    cy.visit("list");
     cy.contains("Добавить в head").as("addHead");
     cy.contains("Добавить в tail").as("addTail");
     cy.contains("Удалить из head").as("removeHead");
@@ -29,20 +33,20 @@ describe("Приложение корректно запускает стран�
   });
 
   it("Проверка корректности дефолтного списка:", () => {
-    cy.get('[data-cy="container"]').children().should("have.length", 5);
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle('container')).children().should("have.length", 5);
+    cy.get(getCircle(0))
       .invoke("text")
       .should((text) => expect(text).not.to.eq(""));
-    cy.get('[data-cy="circle-1"]')
+    cy.get(getCircle(1))
       .invoke("text")
       .should((text) => expect(text).not.to.eq(""));
-    cy.get('[data-cy="circle-2"]')
+    cy.get(getCircle(2))
       .invoke("text")
       .should((text) => expect(text).not.to.eq(""));
-    cy.get('[data-cy="circle-3"]')
+    cy.get(getCircle(3))
       .invoke("text")
       .should((text) => expect(text).not.to.eq(""));
-    cy.get('[data-cy="circle-4"]')
+    cy.get(getCircle(4))
       .invoke("text")
       .should((text) => expect(text).not.to.eq(""));
   });
@@ -52,17 +56,17 @@ describe("Приложение корректно запускает стран�
     cy.get("@inputNumber").type("text");
     cy.get("@addHead").click();
 
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle(0))
       .should("contain", "text")
       .should("have.css", "border-color", CHANGING_COLOR);
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle(0))
       .should("contain", "text")
       .should("have.css", "border-color", MODIFIED_COLOR);
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-0"]').should(
+    cy.get(getCircle(0)).should(
       "have.css",
       "border-color",
       DEFAULT_COLOR
@@ -75,17 +79,17 @@ describe("Приложение корректно запускает стран�
     cy.get("@inputNumber").type("text");
     cy.get("@addTail").click();
 
-    cy.get('[data-cy="circle-4"]')
+    cy.get(getCircle(4))
       .should("contain", "text")
       .should("have.css", "border-color", CHANGING_COLOR);
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-5"]')
+    cy.get(getCircle(5))
       .should("contain", "text")
       .should("have.css", "border-color", MODIFIED_COLOR);
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-5"]').should(
+    cy.get(getCircle(6)).should(
       "have.css",
       "border-color",
       DEFAULT_COLOR
@@ -97,21 +101,21 @@ describe("Приложение корректно запускает стран�
     cy.clock();
     let firstSuspect = "";
     let secondWhosBeFirst = "";
-    cy.get('[data-cy="circle-0"]').should(
+    cy.get(getCircle(0)).should(
       ($text) => (firstSuspect = $text.text())
     );
-    cy.get('[data-cy="circle-1"]').should(
+    cy.get(getCircle(1)).should(
       ($text) => (secondWhosBeFirst = $text.text())
     );
     cy.get("@removeHead").click();
 
     cy.tick(SHORT_DELAY_IN_MS);
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle(0))
       .should("have.css", "border-color", CHANGING_COLOR)
       .invoke("text")
       .should((text) => expect(text).to.eq(firstSuspect));
 
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle(0))
       .should("contain", secondWhosBeFirst)
       .should("have.css", "border-color", DEFAULT_COLOR);
     cy.tick(SHORT_DELAY_IN_MS);
@@ -121,13 +125,13 @@ describe("Приложение корректно запускает стран�
     cy.clock();
     let lastSuspect = "";
 
-    cy.get('[data-cy="circle-4"]').should(
+    cy.get(getCircle(4)).should(
       ($text) => (lastSuspect = $text.text())
     );
     cy.get("@removeTail").click();
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-4"]')
+    cy.get(getCircle(4))
       .should("have.css", "border-color", CHANGING_COLOR)
       .invoke("text")
       .should((text) => expect(text).to.eq(lastSuspect));
@@ -139,8 +143,12 @@ describe("Приложение корректно запускает стран�
     let suspectTextFirst = "";
     let suspectTextSecond = "";
 
-    cy.get('[data-cy="circle-0"]').should(($text) => (suspectTextFirst = $text.text()));
-    cy.get('[data-cy="circle-1"]').should(($text) => (suspectTextSecond = $text.text()));
+    cy.get(getCircle(0)).should(
+      ($text) => (suspectTextFirst = $text.text())
+    );
+    cy.get(getCircle(1)).should(
+      ($text) => (suspectTextSecond = $text.text())
+    );
     cy.clock();
 
     cy.get("@inputNumber").type("text");
@@ -148,29 +156,29 @@ describe("Приложение корректно запускает стран�
 
     cy.get("@addByIndex").click();
 
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle(0))
       .last()
       .should("contain", suspectTextFirst)
       .should("have.css", "border-color", CHANGING_COLOR);
 
-    cy.get('[data-cy="circle-0"]')
+    cy.get(getCircle(0))
       .first()
       .should("contain", "text")
       .should("have.css", "border-color", CHANGING_COLOR);
 
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-1"]')
+    cy.get(getCircle(1))
       .first()
       .should("contain", "text")
       .should("have.css", "border-color", CHANGING_COLOR);
 
-    cy.get('[data-cy="circle-1"]')
+    cy.get(getCircle(1))
       .last()
       .should("contain", suspectTextSecond)
       .should("have.css", "border-color", CHANGING_COLOR);
 
-    cy.get('[data-cy="circle-1"]')
+    cy.get(getCircle(1))
       .last()
       .first()
       .invoke("text")
@@ -188,16 +196,30 @@ describe("Приложение корректно запускает стран�
 
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-0"]').should("have.css", "border-color", DEFAULT_COLOR);
-    cy.get('[data-cy="circle-1"]').should("have.css", "border-color", DEFAULT_COLOR);
-    cy.get('[data-cy="circle-2"]').should("have.css", "border-color", DEFAULT_COLOR);
+    cy.get(getCircle(0)).should(
+      "have.css",
+      "border-color",
+      DEFAULT_COLOR
+    );
+    cy.get(getCircle(1)).should(
+      "have.css",
+      "border-color",
+      DEFAULT_COLOR
+    );
+    cy.get(getCircle(2)).should(
+      "have.css",
+      "border-color",
+      DEFAULT_COLOR
+    );
     cy.get("@inputNumber").should("have.value", "");
   });
 
   it("Проверка удаления элемента по индексу:", () => {
     let suspectText = "";
 
-    cy.get('[data-cy="circle-1"]').should(($text) => (suspectText = $text.text()));
+    cy.get(getCircle(1)).should(
+      ($text) => (suspectText = $text.text())
+    );
 
     cy.clock();
 
@@ -206,7 +228,7 @@ describe("Приложение корректно запускает стран�
 
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-0"]').should(
+    cy.get(getCircle(0)).should(
       "have.css",
       "border-color",
       CHANGING_COLOR
@@ -214,7 +236,7 @@ describe("Приложение корректно запускает стран�
 
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-1"]').should(
+    cy.get(getCircle(1)).should(
       "have.css",
       "border-color",
       CHANGING_COLOR
@@ -222,28 +244,28 @@ describe("Приложение корректно запускает стран�
 
     cy.tick(LONG_DELAY_IN_MS);
 
-    cy.get('[data-cy="circle-1"]')
-    .last()
-    .should("contain", "")
-    .should("have.css", "border-color", DEFAULT_COLOR);
+    cy.get(getCircle(1))
+      .last()
+      .should("contain", "")
+      .should("have.css", "border-color", DEFAULT_COLOR);
 
-    cy.get('[data-cy="circle-1"]')
-    .first()
-    .should("contain", suspectText)
-    .should("have.css", "border-color", CHANGING_COLOR);
+    cy.get(getCircle(1))
+      .first()
+      .should("contain", suspectText)
+      .should("have.css", "border-color", CHANGING_COLOR);
 
     cy.tick(SHORT_DELAY_IN_MS);
-    cy.get('[data-cy="circle-0"]').should(
+    cy.get(getCircle(0)).should(
       "have.css",
       "border-color",
       DEFAULT_COLOR
     );
-    cy.get('[data-cy="circle-1"]').should(
+    cy.get(getCircle(1)).should(
       "have.css",
       "border-color",
       DEFAULT_COLOR
     );
-    cy.get('[data-cy="circle-2"]').should(
+    cy.get(getCircle(2)).should(
       "have.css",
       "border-color",
       DEFAULT_COLOR

@@ -1,7 +1,6 @@
 import { SortingPage } from "./sorting-page";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { Button } from "../ui/button/button";
 
 jest.setTimeout(15000);
 describe("Корректно сортирует:", () => {
