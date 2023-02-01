@@ -89,7 +89,7 @@ describe("Приложение корректно запускает стран�
       .should("have.css", "border-color", MODIFIED_COLOR);
     cy.tick(SHORT_DELAY_IN_MS);
 
-    cy.get(getCircle(6)).should(
+    cy.get(getCircle(5)).should(
       "have.css",
       "border-color",
       DEFAULT_COLOR

@@ -1,10 +1,11 @@
 /// <reference types="cypress" />
+import { BUTTON } from "../../src/constants/element-captions";
 import { getCircle } from "../utils/ultils";
 
 describe("Приложение корректно запускает страницу Фибоначчи:", () => {
   beforeEach(() => {
     cy.visit("fibonacci");
-    cy.get("button.text_type_button.text").as("startButton");
+    cy.get(BUTTON).as("startButton");
     cy.get("input.text.text_type_input").as("input");
   });
 

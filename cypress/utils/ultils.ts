@@ -1,3 +1,3 @@
-export const getCircle = (index) => {
-    return `[data-cy="circle-${index}"]`;
+export const getCircle = (id: string | number) => {
+    return id === "container" ? `[data-cy=${id}]` : `[data-cy="circle-${id}"]`;
   }
