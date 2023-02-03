@@ -1,9 +1,6 @@
 /// <reference types="cypress" />
 import { SHORT_DELAY_IN_MS } from "../../src/constants/delays";
-import {
-  CHANGING_COLOR,
-  DEFAULT_COLOR,
-} from "../../src/constants/colors";
+import { CHANGING_COLOR, DEFAULT_COLOR } from "../../src/constants/colors";
 import { getCircle } from "../utils/ultils";
 
 describe("Приложение корректно запускает страницу Очередь:", () => {
@@ -37,7 +34,7 @@ describe("Приложение корректно запускает стран�
       .should("have.text", "head")
       .next()
       .next()
-      .next() 
+      .next()
       .should("have.text", "tail");
     cy.tick(SHORT_DELAY_IN_MS);
 
@@ -106,7 +103,7 @@ describe("Приложение корректно запускает стран�
     cy.get("@input").type("1");
     cy.get("@add").click();
     cy.tick(SHORT_DELAY_IN_MS);
-    
+
     cy.get("@input").type("2");
     cy.get("@add").click();
     cy.tick(SHORT_DELAY_IN_MS);
