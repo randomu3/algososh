@@ -23,7 +23,7 @@ export const Circle: React.FC<CircleProps> = ({
   isSmall,
 }) => {
   return (
-    <div className={`${styles.content} ${extraClass}`}>
+    <div data-testid="circle" className={`${styles.content} ${extraClass}`}>
       <div
         className={`text text_type_input text_color_input mb-4 ${
           styles.absolute
@@ -34,12 +34,14 @@ export const Circle: React.FC<CircleProps> = ({
         {head}
       </div>
       <div
+        data-cy={"circle-" + index}
         className={`${styles.circle}  ${isSmall ? styles.small : ""} ${
           styles[state]
         }`}
       >
         <p
           className={`text text_type_circle text_color_input ${styles.letter}`}
+          data-testid={"circle-letter"}
         >
           {letter}
         </p>
@@ -47,12 +49,13 @@ export const Circle: React.FC<CircleProps> = ({
       <p
         className={`text text_type_input text_color_input mt-4 ${styles.absolute} ${styles.index}`}
       >
-        {index?.toString()}
+        {(index && !isSmall) || (index === 0 && !isSmall) ? index.toString() : ""}
+        {/* {index?.toString()} index? - DO NOT WORKING YANDEX PRACTICUM */}
       </p>
       <div
         className={`text text_type_input text_color_input mt-4 ${
           styles.absolute
-        } ${index?.toString() ? styles.tail60 : styles.tail30} ${
+        } ${index || index === 0 ? styles.tail60 : styles.tail30} ${
           styles[typeof tail === "string" ? "string" : "element"]
         }`}
       >

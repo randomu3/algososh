@@ -3,10 +3,7 @@ import Marquee from "react-fast-marquee";
 import { Link } from "react-router-dom";
 
 import styles from "./main-page.module.css";
-
-interface MainPageProps {
-  extraClass?: string;
-}
+import { MainPageProps } from "./utils";
 
 export const MainPage: React.FC<MainPageProps> = ({ extraClass = "" }) => {
   return (
@@ -23,7 +20,7 @@ export const MainPage: React.FC<MainPageProps> = ({ extraClass = "" }) => {
       </div>
       <div className={styles.cards_box}>
         <Link className={styles.link} to="/recursion">
-          <div className={`${styles.card} ${styles.string}`} />
+          <div className={`${styles.card} ${styles.string}`}/>
         </Link>
         <Link className={styles.link} to="/fibonacci">
           <div className={`${styles.card} ${styles.fibonacci}`} />
